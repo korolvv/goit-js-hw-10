@@ -1,0 +1,1 @@
+form{display:flex;flex-direction:column;gap:30px;margin-top:30px;max-width:350px;font-size:20px;font-family:Helvetica,serif}a{font-size:20px}button,input,fieldset{font-size:20px;font-family:Helvetica,serif;display:inline-block;border:1px #000 solid;border-radius:15px;padding:15px}fieldset{display:flex;justify-content:space-evenly}fieldset label,button{cursor:pointer}
