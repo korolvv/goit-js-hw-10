@@ -29,31 +29,8 @@ const options = {
   },
 };
 
-let userSelectedDate = 0;
-const fp = flatpickr(myInput, options);
-
-function convertMs(ms) {
-  // Number of milliseconds per unit of time
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  // Remaining days
-  const days = Math.floor(ms / day);
-  // Remaining hours
-  const hours = Math.floor((ms % day) / hour);
-  // Remaining minutes
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  // Remaining seconds
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
-
-  return { days, hours, minutes, seconds };
-}
-
 function falseTime(selected, current) {
   if (selected < current) {
-    btnStart.setAttribute('disabled', 'disabled');
     iziToast.error({
       title: 'Error',
       message: 'Please choose a date in the future',
@@ -63,24 +40,51 @@ function falseTime(selected, current) {
   }
 }
 
+let userSelectedDate = 0;
+const fp = flatpickr(myInput, options);
+
+function convertMs(ms) {
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+
+  const days = Math.floor(ms / day);
+  const hours = Math.floor((ms % day) / hour);
+  const minutes = Math.floor(((ms % day) % hour) / minute);
+  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+
+  return { days, hours, minutes, seconds };
+}
+
 btnStart.addEventListener('click', e => {
   e.target.setAttribute('disabled', 'disabled');
   myInput.setAttribute('disabled', 'disabled');
-  const diff = userSelectedDate - currentDate;
-  const datesArr = convertMs(diff);
-  for (const field in fields) {
-    for (const key in datesArr) {
-      console.log(field, key);
-      if (field === key) {
-        const value = addLeadingZero(datesArr[key]);
-        fields[field].innerHTML = `${value}`;
-        continue;
-      }
-    }
-  }
+  updateTimer();
 });
 
 function addLeadingZero(value) {
   value = String(value).padStart(2, '0');
   return value;
+}
+
+function updateTimer() {
+  setInterval(() => {
+    let diff = userSelectedDate - Date.now();
+    if (diff >= 0) {
+      let datesArr = convertMs(diff);
+      for (const field in fields) {
+        for (const key in datesArr) {
+          if (field === key) {
+            const value = addLeadingZero(datesArr[key]);
+            fields[field].innerHTML = `${value}`;
+            break;
+          }
+        }
+      }
+    } else {
+      btnStart.removeAttribute('disabled');
+      myInput.removeAttribute('disabled');
+    }
+  }, 1000);
 }
